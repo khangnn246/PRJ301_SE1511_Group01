@@ -1,0 +1,128 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package Servlet;
+
+import DAO.UserDAO;
+import DTO.UserDTO;
+import DTO.UserError;
+import Services.UserValidator;
+import java.io.IOException;
+import java.io.PrintWriter;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+/**
+ *
+ * @author congt
+ */
+public class AdminUpdateServlet extends HttpServlet {
+    
+    private static final String SUCCESS = "AdminListServlet";
+    private static final String FAILED = "Error.jsp";
+    
+    /**
+     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
+     * methods.
+     *
+     * @param request servlet request
+     * @param response servlet response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        
+        String userIdStr = request.getParameter("userId");
+        
+        String url = FAILED;
+        
+        try {
+            int userId = Integer.parseInt(userIdStr);
+            
+            UserDAO userDao = new UserDAO();
+            
+            UserDTO user = userDao.getUserById(userId);
+            
+            String password = request.getParameter("password-"+userId);
+            String roleStr = request.getParameter("role-"+userId);
+            int role = Integer.parseInt(roleStr);
+            
+            user.setPassword(password);
+            user.setRole(role);
+            
+            boolean valid = true;
+            
+            UserError userErrorObject = new UserError();
+            userErrorObject.setUserId(userId);
+            
+            userErrorObject.setPasswordError(UserValidator.validatePassaword(password));
+            if(userErrorObject.getPasswordError() != null) valid = false;
+            System.out.println(userErrorObject.getPasswordError());
+            
+            request.setAttribute("userErrorObject", userErrorObject);
+            
+            if (valid) {
+                boolean status = userDao.UpdateUser(user);
+
+                if (status) {
+                    url = SUCCESS;
+                } else {
+                    url = FAILED;
+                }
+            }
+            
+            url = SUCCESS;
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            url = FAILED;
+        } finally {
+            request.getRequestDispatcher(url).forward(request, response);
+        }
+    }
+
+    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
+    /**
+     * Handles the HTTP <code>GET</code> method.
+     *
+     * @param request servlet request
+     * @param response servlet response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        processRequest(request, response);
+    }
+
+    /**
+     * Handles the HTTP <code>POST</code> method.
+     *
+     * @param request servlet request
+     * @param response servlet response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        processRequest(request, response);
+    }
+
+    /**
+     * Returns a short description of the servlet.
+     *
+     * @return a String containing servlet description
+     */
+    @Override
+    public String getServletInfo() {
+        return "Short description";
+    }// </editor-fold>
+
+}
