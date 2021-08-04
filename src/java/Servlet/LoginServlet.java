@@ -29,7 +29,6 @@ public class LoginServlet extends HttpServlet {
     private final String LOGIN_SUCCESS = "";
     private final String LOGIN_ADMIN_SUCCESS = "/WEB-INF/jsp/AdminList.jsp";
     private final String LOGIN_PAGE = "Login.jsp";
-    private final String LOGIN_USER_SUCCESS = "/WEB-INF/UserPage.jsp";
     private final String LOGIN_FAIL = "/WEB-INF/Error.jsp";
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -54,12 +53,7 @@ public class LoginServlet extends HttpServlet {
             
             if (dto != null){
                 session.setAttribute("USER", dto);
-//                if (dto.getRole() == 1){
-//                    url = LOGIN_ADMIN_SUCCESS;
-//                }
-//                else if (dto.getRole() == 2){
-//                    url = LOGIN_USER_SUCCESS;
-//                }
+
             url = LOGIN_SUCCESS;
             }
             else {
